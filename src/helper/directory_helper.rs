@@ -326,7 +326,8 @@ mod test {
                                                            true,
                                                            ::AccessLevel::Private,
                                                            None));
-        let fetched = eval_result!(dir_helper.get(directory.get_key(),
+        let fetched = eval_result!(dir_helper.get(directory.get_info().get_id(),
+                                                  directory.get_info().get_type_tag(),
                                                   directory.get_metadata().is_versioned(),
                                                   directory.get_metadata().get_access_level()));
         assert_eq!(directory, fetched);
@@ -338,7 +339,8 @@ mod test {
                                                              ::AccessLevel::Private,
                                                              Some(&mut directory)));
         // Assert whether parent is updated
-        let parent = eval_result!(dir_helper.get(directory.get_key(),
+        let parent = eval_result!(dir_helper.get(directory.get_info().get_id(),
+                                                 directory.get_info().get_type_tag(),
                                                  directory.get_metadata().is_versioned(),
                                                  directory.get_metadata().get_access_level()));
         assert!(parent.find_sub_directory(child_directory.get_info().get_name()).is_some());
@@ -362,7 +364,8 @@ mod test {
             let test_client = eval_result!(::safe_client::utility::test_utils::get_client());
             let client = ::std::sync::Arc::new(::std::sync::Mutex::new(test_client));
             let dir_helper = DirectoryHelper::new(client.clone());
-            let retrieved_public_directory = eval_result!(dir_helper.get(public_directory.get_key(),
+            let retrieved_public_directory = eval_result!(dir_helper.get(public_directory.get_info().get_id(),
+                                                                         public_directory.get_info().get_type_tag(),
                                                                          true,
                                                                          &::AccessLevel::Public));
             assert_eq!(retrieved_public_directory, public_directory);
@@ -387,7 +390,8 @@ mod test {
             let test_client = eval_result!(::safe_client::utility::test_utils::get_client());
             let client = ::std::sync::Arc::new(::std::sync::Mutex::new(test_client));
             let dir_helper = DirectoryHelper::new(client.clone());
-            let retrieved_public_directory = eval_result!(dir_helper.get(public_directory.get_key(),
+            let retrieved_public_directory = eval_result!(dir_helper.get(public_directory.get_info().get_id(),
+                                                                         public_directory.get_info().get_type_tag(),
                                                                          false,
                                                                          &::AccessLevel::Public));
             assert_eq!(retrieved_public_directory, public_directory);
@@ -418,9 +422,9 @@ mod test {
         let dir_helper = DirectoryHelper::new(client.clone());
         let config_dir = eval_result!(dir_helper.get_configuration_directory_listing("DNS".to_string()));
         assert_eq!(config_dir.get_info().get_name().clone(), "DNS".to_string());
-        let id = config_dir.get_info().get_key().0.clone();
+        let id = config_dir.get_info().get_id().clone();
         let config_dir = eval_result!(dir_helper.get_configuration_directory_listing("DNS".to_string()));
-        assert_eq!(config_dir.get_info().get_key().0.clone(), id);
+        assert_eq!(config_dir.get_info().get_id().clone(), id);
     }
 
     #[test]
@@ -436,21 +440,21 @@ mod test {
                                                              ::AccessLevel::Private,
                                                              None));
 
-        let mut versions = eval_result!(dir_helper.get_versions(dir_listing.get_key()));
+        let mut versions = eval_result!(dir_helper.get_versions(dir_listing.get_info().get_id(), dir_listing.get_info().get_type_tag()));
         assert_eq!(versions.len(), 1);
 
         dir_listing.get_mut_metadata().set_name("NewName".to_string());
         assert!(dir_helper.update(&dir_listing).is_ok());
 
-        versions = eval_result!(dir_helper.get_versions(dir_listing.get_key()));
+        versions = eval_result!(dir_helper.get_versions(dir_listing.get_info().get_id(), dir_listing.get_info().get_type_tag()));
         assert_eq!(versions.len(), 2);
 
-        let rxd_dir_listing = eval_result!(dir_helper.get_by_version(dir_listing.get_key(),
+        let rxd_dir_listing = eval_result!(dir_helper.get_by_version(dir_listing.get_info().get_id(),
                                                                      dir_listing.get_metadata().get_access_level(),
                                                                      versions[versions.len() - 1].clone()));
         assert_eq!(rxd_dir_listing, dir_listing);
 
-        let rxd_dir_listing = eval_result!(dir_helper.get_by_version(dir_listing.get_key(),
+        let rxd_dir_listing = eval_result!(dir_helper.get_by_version(dir_listing.get_info().get_id(),
                                                                      dir_listing.get_metadata().get_access_level(),
                                                                      versions[0].clone()));
         assert_eq!(*rxd_dir_listing.get_metadata().get_name(), "DirName2".to_string());
