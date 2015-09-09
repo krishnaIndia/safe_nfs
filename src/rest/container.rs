@@ -211,7 +211,7 @@ impl Container {
         let user_metadata = try!(self.validate_metadata(metadata));
         let file = blob.convert_to_file();
         let file_helper = ::helper::file_helper::FileHelper::new(self.client.clone());
-        if let Some(parent_directory_listing) = try!(file_helper.update_metadata(file.clone(), user_metadata, self.directory_listing.clone())) {
+        if let Some(parent_directory_listing) = try!(file_helper.update_metadata(file.clone(), user_metadata, &mut self.directory_listing)) {
             Ok(Some(Container {
                 client           : self.client.clone(),
                 directory_listing: parent_directory_listing,
@@ -294,19 +294,19 @@ mod test {
         let client = get_client();
         let root_dir = eval_result!(Container::authorise(client.clone(), None));
         let root_dir_second = eval_result!(Container::authorise(client.clone(), None));
-        assert_eq!(*root_dir.get_info().convert_to_directory_info().get_key().0,
-                   *root_dir_second.get_info().convert_to_directory_info().get_key().0);
+        assert_eq!(*root_dir.get_info().convert_to_directory_info().get_id(),
+                   *root_dir_second.get_info().convert_to_directory_info().get_id());
 
         let root_dir_from_info = eval_result!(Container::authorise(client, Some(root_dir.get_info())));
-        assert_eq!(*root_dir.get_info().convert_to_directory_info().get_key().0,
-                   *root_dir_from_info.get_info().convert_to_directory_info().get_key().0);
+        assert_eq!(*root_dir.get_info().convert_to_directory_info().get_id(),
+                   *root_dir_from_info.get_info().convert_to_directory_info().get_id());
     }
 
     #[test]
     fn create_container() {
         let client = get_client();
         let mut container = Container::authorise(client.clone(), None).ok().unwrap();
-        eval_result!(container.create("Home".to_string(), true, ::AccessLevel::Private));
+        eval_result!(container.create("Home".to_string(), true, ::AccessLevel::Private, None));
 
         assert_eq!(container.get_containers().len(), 1);
         assert_eq!(container.get_containers()[0].get_name(), "Home");
@@ -318,7 +318,7 @@ mod test {
         let client = get_client();
         let dir_name = "Home".to_string();
         let mut container = eval_result!(Container::authorise(client, None));
-        eval_result!(container.create(dir_name.clone(), true, ::AccessLevel::Private));
+        eval_result!(container.create(dir_name.clone(), true, ::AccessLevel::Private, None));
 
         assert_eq!(container.get_containers().len(), 1);
         assert_eq!(container.get_containers()[0].get_name(), "Home");
@@ -332,7 +332,7 @@ mod test {
     fn create_update_delete_blob() {
         let client = get_client();
         let mut container = eval_result!(Container::authorise(client.clone(), None));
-        let mut home_container = eval_result!(container.create("Home".to_string(), true, ::AccessLevel::Private));
+        let mut home_container = eval_result!(container.create("Home".to_string(), true, ::AccessLevel::Private, None));
 
         assert_eq!(container.get_containers().len(), 1);
         assert_eq!(container.get_containers()[0].get_name(), "Home");
@@ -364,11 +364,11 @@ mod test {
             }
         }
         let metadata = "{\"purpose\": \"test\"}".to_string();
-        home_container = eval_result!(home_container.update_blob_metadata(blob, Some(metadata.clone())));
+        let _ = eval_result!(home_container.update_blob_metadata(blob, Some(metadata.clone())));
         let blob = eval_result!(home_container.get_blob("sample.txt".to_string()));
         assert_eq!(blob.get_metadata(), metadata);
 
-        let mut docs_container = eval_result!(container.create("Docs".to_string(), true, ::AccessLevel::Private));
+        let mut docs_container = eval_result!(container.create("Docs".to_string(), true, ::AccessLevel::Private, None));
         assert_eq!(docs_container.get_blobs().len(), 0);
         let _ = home_container.copy_blob(&"sample.txt".to_string(), &docs_container.get_info());
         docs_container = eval_result!(container.get_container(&docs_container.get_info(), None));

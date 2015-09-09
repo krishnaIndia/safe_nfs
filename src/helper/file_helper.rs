@@ -68,14 +68,14 @@ impl FileHelper {
 
     /// Updates the file metadata. Returns the updated parent DirectoryListing
     pub fn update_metadata(&self,
-                           mut file            : ::file::File,
-                           user_metadata       : Vec<u8>,
-                           mut parent_directory: ::directory_listing::DirectoryListing) -> Result<Option<::directory_listing::DirectoryListing>, ::errors::NfsError> {
+                           mut file        : ::file::File,
+                           user_metadata   : Vec<u8>,
+                           parent_directory: &mut ::directory_listing::DirectoryListing) -> Result<Option<::directory_listing::DirectoryListing>, ::errors::NfsError> {
         let _ = try!(parent_directory.find_file(file.get_name()).ok_or(::errors::NfsError::FileNotFound));
         file.get_mut_metadata().set_user_metadata(user_metadata);
         try!(parent_directory.upsert_file(file));
         let directory_helper = ::helper::directory_helper::DirectoryHelper::new(self.client.clone());
-        directory_helper.update(&parent_directory)
+        directory_helper.update(parent_directory)
     }
 
     /// Return the versions of a directory containing modified versions of a file
@@ -168,7 +168,7 @@ mod test {
         }
         {// Update Metadata
             let file = eval_option!(directory.find_file(&file_name).map(|file| file.clone()), "File not found");
-            directory = eval_result!(file_helper.update_metadata(file, vec![12u8; 10], directory));
+            eval_result!(file_helper.update_metadata(file, vec![12u8; 10], &mut directory));
             let file = eval_option!(directory.find_file(&file_name).map(|file| file.clone()), "File not found");
             assert_eq!(*file.get_metadata().get_user_metadata(), vec![12u8; 10]);
         }
