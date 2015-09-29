@@ -19,14 +19,14 @@
 ###Build Instructions:
 `safe_nfs` depends on `safe_client` which can interface conditionally against either the routing crate or a mock used for local testing.
 
-To use it with the Mock:
-```
-cargo build --features "use-mock-routing"
-cargo test --features "use-mock-routing"
-```
-
 To interface it with actual routing (default):
 ```
 cargo build
 cargo test
+```
+
+To use it with the Mock:
+```
+cargo build --features "use-mock-routing"
+cargo test --features "use-mock-routing"
 ```

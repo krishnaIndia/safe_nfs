@@ -59,7 +59,7 @@ pub mod errors;
 pub mod helper;
 /// Directory and File Metadata
 pub mod metadata;
-/// Module for directory reltaed structs - DirectoryListin, DirectoryInfo
+/// Module for directory related structs - DirectoryListing, DirectoryInfo
 pub mod directory_listing;
 
 /// Root directory name

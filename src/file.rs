@@ -16,7 +16,7 @@
 // relating to use of the SAFE Network Software.
 
 /// Representation of a File to be put into the network. Could be text, music, video etc any kind
-/// of file
+/// of a binary content
 #[derive(RustcEncodable, RustcDecodable, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct File {
     id      : ::routing::NameType,

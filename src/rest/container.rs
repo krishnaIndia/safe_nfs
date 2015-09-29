@@ -26,7 +26,8 @@ pub struct Container {
 impl Container {
 
     /// Authorises the directory access.
-    /// This sevrves as the initial access point of the Rest API. Operations can only be performed on a Container object.
+    /// This sevrves as the initial access point of the Rest API.
+    /// NFS Operations can only be performed on a Container object.
     /// If the ContainerInfo parameter is None, then the user's root directory is returned.
     /// Returns the Container, if authorisation is successful.
     pub fn authorise(client        : ::std::sync::Arc<::std::sync::Mutex<::safe_client::client::Client>>,
@@ -46,7 +47,7 @@ impl Container {
         })
     }
 
-    /// This functions is incoked to create a new container
+    /// This functions is invoked to create a new container
     /// Say there are nested containers,
     ///     Home
     ///       -  Pictures
@@ -403,7 +404,7 @@ mod test {
 
         let data_updated = "Hello World updated!".to_string().into_bytes();
         let _ = eval_result!(home_container.update_blob_content(&blob, &data_updated[..]));
-        
+
         let blob = eval_result!(home_container.get_blob("sample.txt".to_string()));
         assert_eq!(eval_result!(home_container.get_blob_content(&blob)), data_updated);
 
