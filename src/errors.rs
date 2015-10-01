@@ -20,7 +20,7 @@
 pub const NFS_ERROR_START_RANGE: i32 = ::safe_client::errors::CLIENT_ERROR_START_RANGE - 500;
 
 /// NFS Errors
-#[allow(variant_size_differences)] // TODO
+#[allow(variant_size_differences)]
 pub enum NfsError {
     /// Client Error
     ClientError(::safe_client::errors::ClientError),
@@ -81,7 +81,7 @@ impl ::std::fmt::Debug for NfsError {
             NfsError::DestinationAndSourceAreSame           => write!(f, "NfsError::DestinationAndSourceAreSame"),
             NfsError::DirectoryNotFound                     => write!(f, "NfsError::DirectoryNotFound"),
             NfsError::FileAlreadyExistsWithSameName         => write!(f, "NfsError::FileAlreadyExistsWithSameName"),
-            NfsError::FileDoesNotMatch                      => write!(f, "NfsError::FileDoesNotMatch"),            
+            NfsError::FileDoesNotMatch                      => write!(f, "NfsError::FileDoesNotMatch"),
             NfsError::FileNotFound                          => write!(f, "NfsError::FileNotFound"),
             NfsError::InvalidRangeSpecified                 => write!(f, "NfsError::InvalidRangeSpecified"),
             NfsError::ParameterIsNotValid                   => write!(f, "NfsError::ParameterIsNotValid"),
